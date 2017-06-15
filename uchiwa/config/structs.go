@@ -41,6 +41,7 @@ type GlobalConfig struct {
 	Enterprise   bool
 	Github       Github
 	Gitlab       Gitlab
+	Jira         Jira
 	Ldap         Ldap
 	OIDC         OIDC
 	SSL          SSL
@@ -121,4 +122,12 @@ type UsersOptions struct {
 	LogoURL                string
 	Refresh                int
 	RequireSilencingReason bool
+}
+
+// Jira struct contains info for integrating with Atlassian Jira
+type Jira struct {
+    URL     string
+    User    string
+    Pass    string
+    Project string
 }

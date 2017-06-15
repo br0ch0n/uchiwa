@@ -114,6 +114,19 @@ type Metrics struct {
 	Stashes     StatusMetrics `json:"stashes"`
 }
 
+// Silence is a structure for holding the silence creation payload
+type Silence struct {
+    ID               string `json:"id"`
+    Dc               string `json:"dc"`
+    Subscription     string `json:"subscription,omitempty"`
+    Check            string `json:"check,omitempty"`
+    Reason           string `json:"reason,omitempty"`
+    Creator          string `json:"creator,omitempty"`
+    Expire           int32  `json:"expire,omitempty"`
+    ExpireOnResolve  bool   `json:"expire_on_resolve,omitempty"`
+    CreateJiraTicket bool   `json:"create_jira_ticket,omitempty"`
+}
+
 // StatusMetrics is a structure for holding the status count
 type StatusMetrics struct {
 	Critical int `json:"critical"`

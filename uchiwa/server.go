@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+    "reflect"
 
 	"github.com/sensu/uchiwa/uchiwa/audit"
 	"github.com/sensu/uchiwa/uchiwa/authentication"
 	"github.com/sensu/uchiwa/uchiwa/authorization"
 	"github.com/sensu/uchiwa/uchiwa/filters"
 	"github.com/sensu/uchiwa/uchiwa/helpers"
+	"github.com/sensu/uchiwa/uchiwa/jira"
 	"github.com/sensu/uchiwa/uchiwa/logger"
 	"github.com/sensu/uchiwa/uchiwa/structs"
 )
@@ -960,7 +962,7 @@ func (u *Uchiwa) silencedHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == "POST" {
 		// POST on /silenced
 		decoder := json.NewDecoder(r.Body)
-		var data silence
+		var data structs.Silence
 		err := decoder.Decode(&data)
 		if err != nil {
 			http.Error(w, "Could not decode body", http.StatusInternalServerError)
@@ -992,12 +994,26 @@ func (u *Uchiwa) silencedHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Open-ended silence entries are disallowed", http.StatusNotFound)
 			return
 		}
+        if data.CreateJiraTicket == true {
+            logger.Infof("logo is %v, url is %v", u.Config.Uchiwa.UsersOptions.LogoURL, u.Config.Uchiwa.Jira.URL)
+            logger.Infof("data is %+v", data)
+            logger.Infof("datatype is %v", reflect.TypeOf(data))
+            jiraticket, err := jira.CreateJiraTicket(u.Config.Uchiwa.Jira, data)
+            if err != nil {
+                fmt.Printf("%v\n", reflect.TypeOf(err.Error()))
+                http.Error(w, "Couldn't create Jira ticket. See server logs", http.StatusNotFound)
+                //logger.Warningf("Couldn't create Jira ticket because: %v", err.Error())
+                return
+            } else {
+              data.Reason = jiraticket
+            }
+        }
+
 
 		if u.Config.Uchiwa.UsersOptions.RequireSilencingReason && data.Reason == "" {
 			http.Error(w, "A reason must be provided for every silence entry", http.StatusNotFound)
 			return
 		}
-
 		err = u.PostSilence(data)
 		if err != nil {
 			http.Error(w, "Could not create the entry in the silenced registry", http.StatusNotFound)
@@ -1174,7 +1190,8 @@ func (u *Uchiwa) WebServer(publicPath *string, auth authentication.Config) {
 
 	listen := fmt.Sprintf("%s:%d", u.Config.Uchiwa.Host, u.Config.Uchiwa.Port)
 	logger.Warningf("Uchiwa is now listening on %s", listen)
-
+//logger.Infof("logo is %v, url is %v", u.Config.Uchiwa.UsersOptions.LogoURL, u.Config.Uchiwa.Jira.URL)
+//logger.Infof("jira is %v", jira.CreateJiraTicket(u.Config.Uchiwa.Jira))
 	if u.Config.Uchiwa.SSL.CertFile != "" && u.Config.Uchiwa.SSL.KeyFile != "" {
 		logger.Fatal(http.ListenAndServeTLS(listen, u.Config.Uchiwa.SSL.CertFile, u.Config.Uchiwa.SSL.KeyFile, nil))
 	}
