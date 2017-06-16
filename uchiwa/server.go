@@ -12,6 +12,7 @@ import (
 	"github.com/sensu/uchiwa/uchiwa/authorization"
 	"github.com/sensu/uchiwa/uchiwa/filters"
 	"github.com/sensu/uchiwa/uchiwa/helpers"
+    "github.com/sensu/uchiwa/uchiwa/jira"
 	"github.com/sensu/uchiwa/uchiwa/logger"
 	"github.com/sensu/uchiwa/uchiwa/structs"
 )
@@ -1124,7 +1125,7 @@ func (u *Uchiwa) silencedHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodPost {
 		// POST on /silenced
 		decoder := json.NewDecoder(r.Body)
-		var data silence
+		var data structs.Silence
 		err := decoder.Decode(&data)
 		if err != nil {
 			http.Error(w, "Could not decode body", http.StatusInternalServerError)
@@ -1156,6 +1157,16 @@ func (u *Uchiwa) silencedHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Open-ended silence entries are disallowed", http.StatusNotFound)
 			return
 		}
+
+        if data.CreateJiraTicket == true {
+            jiraticket, err := jira.CreateJiraTicket(u.Config.Uchiwa.Jira, data)
+            if err != nil {
+                http.Error(w, "Couldn't create Jira ticket. See server logs", http.StatusNotFound)
+                return
+            } else {
+              data.Reason = jiraticket
+            }
+        }
 
 		if u.Config.Uchiwa.UsersOptions.RequireSilencingReason && data.Reason == "" {
 			http.Error(w, "A reason must be provided for every silence entry", http.StatusNotFound)

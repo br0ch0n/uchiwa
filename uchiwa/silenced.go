@@ -1,20 +1,12 @@
 package uchiwa
 
-import "github.com/sensu/uchiwa/uchiwa/logger"
-
-type silence struct {
-	ID              string `json:"id"`
-	Dc              string `json:"dc"`
-	Subscription    string `json:"subscription,omitempty"`
-	Check           string `json:"check,omitempty"`
-	Reason          string `json:"reason,omitempty"`
-	Creator         string `json:"creator,omitempty"`
-	Expire          int32  `json:"expire,omitempty"`
-	ExpireOnResolve bool   `json:"expire_on_resolve,omitempty"`
-}
+import (
+    "github.com/sensu/uchiwa/uchiwa/logger"
+    "github.com/sensu/uchiwa/uchiwa/structs"
+)
 
 // ClearSilenced send a POST request to the /stashes endpoint in order to create a stash
-func (u *Uchiwa) ClearSilenced(data silence) error {
+func (u *Uchiwa) ClearSilenced(data structs.Silence) error {
 	api, err := getAPI(u.Datacenters, data.Dc)
 	if err != nil {
 		logger.Warning(err)
@@ -31,7 +23,7 @@ func (u *Uchiwa) ClearSilenced(data silence) error {
 }
 
 // PostSilence send a POST request to the /stashes endpoint in order to create a stash
-func (u *Uchiwa) PostSilence(data silence) error {
+func (u *Uchiwa) PostSilence(data structs.Silence) error {
 	api, err := getAPI(u.Datacenters, data.Dc)
 	if err != nil {
 		logger.Warning(err)

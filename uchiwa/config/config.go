@@ -293,6 +293,7 @@ func (c *Config) GetPublic() *Config {
 	p.Uchiwa.Github.ClientSecret = obfuscatedValue
 	p.Uchiwa.Gitlab.ClientID = obfuscatedValue
 	p.Uchiwa.Gitlab.ClientSecret = obfuscatedValue
+    p.Uchiwa.Jira.Pass = obfuscatedValue
 	p.Uchiwa.Ldap.BindPass = obfuscatedValue
 	p.Uchiwa.OIDC.ClientID = obfuscatedValue
 	p.Uchiwa.OIDC.ClientSecret = obfuscatedValue
