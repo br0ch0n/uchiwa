@@ -22,7 +22,7 @@ func CreateJiraTicket(jiraconfig config.Jira, silencedata structs.Silence) (stri
 			Reporter: &jira.User{
 				Name: jiraconfig.User,
 			},
-			Description: silencedata.Check + " alerted on " + silencedata.Subscription,
+            Description: silencedata.Check + " alerted on " + silencedata.Subscription + ". See " + silencedata.Uchiwalink,
 			Type: jira.IssueType{
 				Name: "Incident",
 			},

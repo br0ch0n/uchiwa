@@ -135,6 +135,7 @@ type Silence struct {
 	Expire           int32  `json:"expire,omitempty"`
 	ExpireOnResolve  bool   `json:"expire_on_resolve,omitempty"`
 	CreateJiraTicket bool   `json:"create_jira_ticket,omitempty"`
+	Uchiwalink       string `json:"uchiwalink,omitempty"`
 }
 
 // StatusMetrics is a structure for holding the status count
