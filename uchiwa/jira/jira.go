@@ -29,7 +29,7 @@ func CreateJiraTicket(jiraconfig config.Jira, silencedata structs.Silence) (stri
 			Project: jira.Project{
 				Key: jiraconfig.Project,
 			},
-			Summary: "Sensu alert: " + silencedata.Check + " on " + silencedata.Subscription + " in " + silencedata.Dc,
+			Summary: silencedata.Check + " on " + silencedata.Subscription + " in " + silencedata.Dc,
 		},
 	}
 	issuenew, resp, err := jiraClient.Issue.Create(&i)
